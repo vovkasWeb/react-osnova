@@ -1,14 +1,18 @@
 import React from 'react'
+import MyButton from './UI/button/MyButton'
 
-const PostItem = ({ post :{id,title,body}}) => {
+const PostItem = ({ post, remove }) => {
+	const { id, title, body } = post
 	return (
 		<div className='post'>
 			<div className='post__content'>
-				<strong>{id}.{title}</strong>
+				<strong>
+					{id}.{title}
+				</strong>
 				<div>{body}</div>
 			</div>
 			<div className='post__btns'>
-				<button>Удалить</button>
+				<MyButton onClick={() => remove(post)}>Удалить</MyButton>
 			</div>
 		</div>
 	)

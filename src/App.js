@@ -4,8 +4,7 @@ import ClassCounter from './components/ClassCounter'
 
 import './style/App.css'
 import PostList from './components/PostList'
-import MyButton from './components/UI/button/MyButton'
-import MyInput from './components/UI/input/MyInput'
+import PostForm from './components/PostForm'
 
 function App() {
 	const [likes, setLikes] = useState(0)
@@ -19,33 +18,21 @@ function App() {
 	function ss(i) {
 		setLikes(likes + i)
 	}
-	const[post, setPost] = useState({title: '',body: ''});
+
 	const bodyInputRef = useRef()
-	const addNewPost = e => {
-		e.preventDefault()
-		setPosts([...posts,{...post,id:Date.now()}])
-    setPost({ title: '', body: '' })
+	const createPost = newPost => {
+		setPosts([...posts, newPost])
 	}
+	const removePost = post => {
+		setPosts(posts.filter(p => p.id !== post.id))
+	}
+
 	return (
 		<div className='App'>
 			<Counter />
 			<ClassCounter />
-			<form>
-				<MyInput
-					value={post.title}
-					onChange={e => setPost({ ...post, title: e.target.value })}
-					type='text'
-					placeholder='Названия поста'
-				/>
-				<MyInput
-					type='text'
-					value={post.body}
-					onChange={e => setPost({ ...post, body: e.target.value })}
-					placeholder='Описание поста'
-				/>
-				<MyButton onClick={e => addNewPost(e)}>Cоздать пост</MyButton>
-			</form>
-			<PostList posts={posts} title={'Список технологий'} />
+			<PostForm create={createPost} />
+			<PostList posts={posts} remove={removePost} title={'Список технологий'} />
 		</div>
 	)
 }
