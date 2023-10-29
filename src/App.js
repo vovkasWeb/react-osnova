@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef, useState, useEffect } from 'react'
 import Counter from './components/Counter'
 import ClassCounter from './components/ClassCounter'
 
@@ -9,56 +9,69 @@ import MySelect from './components/UI/select/MySelect'
 import MyInput from './components/UI/input/MyInput'
 import PostFilter from './components/PostFilter'
 import MyModal from './components/Mymodal/MyModal'
+import MyButton from './components/UI/button/MyButton'
+import { usePosts } from './components/hooks/usePosts'
+import axios from 'axios'
+import PostService from './API/PostServise'
+import Loader from './components/UI/Loader/Loader'
 
 function App() {
 	const [likes, setLikes] = useState(0)
 	const [value, setValue] = useState('text in input')
-	const [posts, setPosts] = useState([
-		{ id: 1, title: 'Js', body: 'description' },
-		{ id: 2, title: 'html', body: 'description0' },
-		{ id: 3, title: 'css', body: 'description01' },
-		{ id: 4, title: 'react', body: 'description02' },
-	])
+	const [modal, setModal] = useState(false)
+	const [filter, setFilter] = useState({ sort: '', query: '' })
+	const [posts, setPosts] = useState([])
+	const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
+	const [isPostsLoading, setIsPostsLoading] = useState(false)
 	function ss(i) {
 		setLikes(likes + i)
+	}
+	useEffect(() => {
+		fetchePosts()
+	}, [])
+
+	async function fetchePosts() {
+		setIsPostsLoading(true)
+		setTimeout(async () => {
+			const posts = await PostService.getAll()
+			setPosts(posts)
+			setIsPostsLoading(false)
+		}, 1000)
 	}
 
 	const bodyInputRef = useRef()
 	const createPost = newPost => {
 		setPosts([...posts, newPost])
+		setModal(false)
 	}
 	const removePost = post => {
 		setPosts(posts.filter(p => p.id !== post.id))
 	}
-const [filter,setFilter] = useState({sort:'',query: ''})
 
-	const sortedPosts = useMemo(() => {
-		if (filter.sort) {
-			return [...posts].sort((a, b) =>a[filter.sort].localeCompare(b[filter.sort])
-			)
-		}
-		return posts
-	}, [filter.sort, posts])
-
-const sortedAndSearchedPosts = useMemo(()=>{
-return sortedPosts.filter(post =>
-	post.title.toLowerCase().includes(filter.query.toLocaleLowerCase()))
-},[filter.query,sortedPosts])
 	return (
 		<div className='App'>
-      <MyModal visible={true}>
-      <PostForm create={createPost} />
-      </MyModal>
+			<button onClick={fetchePosts}>Get Post</button>
+			<MyButton style={{ marginTop: '30' }} onClick={() => setModal(true)}>
+				Создать пользователя
+			</MyButton>
+			<MyModal visible={modal} setVisible={setModal}>
+				<PostForm create={createPost} />
+			</MyModal>
 			<Counter />
 			<ClassCounter />
-			
-			<PostFilter filter={filter} setFilter={setFilter}/>
+
+			<PostFilter filter={filter} setFilter={setFilter} />
+			{isPostsLoading ? (
+				<div style={{ display: 'flex', justifyContent: 'center',marginTop: 50 }}>
+					<Loader />
+				</div>
+			) : (
 				<PostList
 					posts={sortedAndSearchedPosts}
 					remove={removePost}
 					title={'Список технологий'}
 				/>
-		
+			)}
 		</div>
 	)
 }

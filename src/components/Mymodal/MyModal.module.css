@@ -1,4 +1,4 @@
-.MyModal {
+.myModal {
 	position: fixed;
 	top: 0;
 	bottom: 0;
@@ -7,7 +7,7 @@
 	display: none;
 	background: rgba(0, 0, 0, 0.5);
 }
-.myMOdalContent {
+.myModalContent {
 	padding: 25px;
 	background: white;
 	border-radius: 16px;
